@@ -1,3 +1,7 @@
 import { writable } from 'svelte/store';
 
-export const order_store = writable({});
+export const store = writable({
+    total: 0,
+    orders: [],
+    balance: 0
+});

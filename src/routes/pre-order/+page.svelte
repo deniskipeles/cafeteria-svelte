@@ -43,10 +43,10 @@
     </div>
     {#if item.available}
          <!-- content here -->
-         <Buttons clickable={true}/>
+         <Buttons clickable={true} foody={item}/>
     {:else}
          <!-- else content here -->
-         <Buttons clickable={false}/>
+         <Buttons clickable={false} foody={item}/>
     {/if}
 </div>
     </div> 

@@ -29,19 +29,63 @@
 
 
 <script>
-    import {order_store} from "$lib/store/cart";
-    order_store.set({
-        food_items:[],
-        total:0,
-        balance:0,
-    })
-    console.log(order_store)
-
+    import { store } from '$lib/store/cart.js'
+    
     export let clickable;
+    export let foody;
+    let quantity = 0
+    let total = 0
+
+    const addCart = (food_obj) => {
+        let cart = $store.orders;
+        const obj = {
+            name:food_obj.name,
+            id:food_obj.id,
+            price:food_obj.price,
+            quantity:1,
+        }
+        const exist = cart.find(item=>item.id==food_obj.id)
+        if (exist != null && exist != undefined) {
+            exist.quantity += 1
+            cart = cart.filter(item=>item.id != exist.id)
+            cart = [...cart,exist]
+            quantity = exist.quantity
+        } else {
+            cart = [...cart,obj]
+            quantity = 1
+        }
+
+        
+        store.set({
+            ...$store,
+            orders:cart
+        })
+
+        
+        const getTotal = () => {
+            let total = 0
+            $store.orders.forEach((item)=>{
+                total += (+item.price) * (+item.quantity)
+            })
+            return total
+        }
+        
+        store.set({
+            ...$store,
+            total:getTotal()
+        })
+
+
+        console.log($store.orders)
+    }
+    
+
+
+
 </script>
 
 <div class="btn-group">
     <button>-</button>
-    <button>{0}</button>
-    <button>+</button>
+    <button>{quantity}</button>
+    <button on:click={()=>addCart(foody)}>+</button>
 </div>

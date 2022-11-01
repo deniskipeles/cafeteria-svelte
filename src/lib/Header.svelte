@@ -25,6 +25,8 @@
   font-size: 17px;
 }
 
+p{color: aliceblue;}
+
 .topnav a:hover {
   background-color: #ddd;
   color: black;
@@ -74,6 +76,7 @@
   <a href="javascript:void(0);" class="icon" on:click={myFunction}>
     <i class="fa fa-bars"></i>
   </a>
+  <p>{$store.total}</p>
 </div>
 
 
@@ -81,6 +84,8 @@
 
 
 <script>
+     import { store } from '$lib/store/cart.js'
+
     let id="topnav"
     function myFunction() {
     // var x = document.getElementById("myTopnav");
