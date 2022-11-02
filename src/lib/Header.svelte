@@ -76,8 +76,14 @@ p{color: aliceblue;}
   <a href="javascript:void(0);" class="icon" on:click={myFunction}>
     <i class="fa fa-bars"></i>
   </a>
-  <p>{$store.total}</p>
+  <Modal show={$modal}>
+    <Content />
+  </Modal>
+  
 </div>
+
+	
+
 
 
 
@@ -85,6 +91,9 @@ p{color: aliceblue;}
 
 <script>
      import { store } from '$lib/store/cart.js'
+     import Content from './Content.svelte';
+      import Modal from './Modal.svelte';
+      import { modal } from './store/modal.js';
 
     let id="topnav"
     function myFunction() {

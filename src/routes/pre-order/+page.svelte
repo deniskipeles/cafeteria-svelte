@@ -25,7 +25,7 @@
     <div class="row">
     <div class="col-sm-6">
     <!-- <img class="card-img" src="https://material.angular.io/assets/img/examples/shiba1.jpg" alt="Card image"/> -->
-    <img class="card-img" src={`${data.url}/api/files/${item["@collectionId"]}/${item.id}/${item.image}`} alt="Card image"/>
+    <img class="card-img" src={`${data.url}/api/files/${item["@collectionId"]}/${item.id}/${item.image}?thumb=200x200`} alt="Card image"/>
     </div>
     <div class="col-sm-6">
     <div class="card-body-right">
