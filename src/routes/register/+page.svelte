@@ -1,5 +1,5 @@
 <script>
-    import { user as store } from '$lib/store/user';
+    import { user as store, student } from '$lib/store/user';
     import PocketBase from 'pocketbase';
 
     
@@ -19,10 +19,44 @@
           passwordConfirm,
       });  
       // set user profile data
-      // function getname(e) {
-      //   let mail_list = e.split("@")
-      //   return mail_list[0]
-      // }
+      function getRegistration(user_email) {
+        let mail_list = user_email.split("@")
+        return mail_list[0]
+      }
+
+      const getRegList = (email) => {
+            let reg = getRegistration(email)
+            const list = reg.split("-")
+            return list
+      }
+
+
+      const saveStudent = async(u) => {
+        const list = getRegList(u.email)
+        let data = {
+          "first_name": "",
+          "surname": "",
+          "last_name": "",
+          "password": "",
+          "registration_number": getRegistration(u.email),
+          "email": u.email,
+          "image": "",
+          "class_group": list[0],
+          "admission": Number(list[1]),
+          "year": Number(list[2]),
+          "balance": 0,
+          "user_id": u.id
+        }
+
+        // console.log(data)
+
+        const record = await client.records.create('students', data);
+        if (record.id) {
+          store.set(user)
+          student.set(record)
+        }
+
+      }
       // await client.records.update('profiles', user.profile.id, {
       //     name: getname(user.email),
       // });
@@ -30,7 +64,7 @@
       // send verification email
       await client.users.requestVerification(user.email);
       // console.log(user)
-      store.set(user)
+      saveStudent(user)
     }
 </script>
 

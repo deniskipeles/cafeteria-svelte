@@ -90,10 +90,37 @@ p{color: aliceblue;}
 
 
 <script>
-     import { store } from '$lib/store/cart.js'
-     import Content from './Content.svelte';
-      import Modal from './Modal.svelte';
-      import { modal } from './store/modal.js';
+	import { student,user } from './store/user.js';
+    import { onMount } from 'svelte';
+    import Content from './Content.svelte';
+    import Modal from './Modal.svelte';
+    import { modal } from './store/modal.js';
+    import PocketBase from 'pocketbase';
+    
+    const url = 'https://bnet.fly.dev'
+
+    const client = new PocketBase(url);
+
+
+    const fetchAndSetStudent = async(user) => {
+      // console.log(user)
+      const filter = `user_id = "${user.id}"`
+      const resultList = await client.records.getList('students', 1, 2, {
+          filter,
+      });
+      // console.log(resultList)
+      return resultList.items[0]
+    }
+    onMount(async()=>{
+      let user_local = localStorage.getItem("pocketbase_auth")
+      user_local = JSON.parse(user_local)
+      if(user_local.model){
+        // const id = user.model.id
+        const stud = await fetchAndSetStudent(user_local.model)
+        student.set(stud)
+        user.set(user_local.model)
+      }
+    })
 
     let id="topnav"
     function myFunction() {

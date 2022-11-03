@@ -1,5 +1,5 @@
 <script>
-    import { user } from '$lib/store/user';
+    import { user,student } from '$lib/store/user';
     import PocketBase from 'pocketbase';
     
     const url = 'https://bnet.fly.dev'
@@ -8,11 +8,25 @@
 
     // user authentication via email/pass
     let password='',email='';
+
+    const fetchAndSetStudent = async(user) => {
+      console.log(user)
+      const filter = `user_id = "${user.id}"`
+      const resultList = await client.records.getList('students', 1, 2, {
+          filter,
+      });
+      console.log(resultList)
+      return resultList.items[0]
+    }
     
     const signin = async() => {
         const userAuthData = await client.users.authViaEmail(email, password);
         // console.log(userAuthData)
-        if(userAuthData.user) return user.set(userAuthData.user)
+        if(userAuthData.user) {
+          const stud = await fetchAndSetStudent(userAuthData.user)
+          student.set(stud)
+          user.set(userAuthData.user)
+        }
     }
 </script>
 
