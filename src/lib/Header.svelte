@@ -7,63 +7,6 @@
 
 
 
-<style>
-
-
-.topnav {
-  overflow: hidden;
-  background-color: #333;
-}
-
-.topnav a {
-  float: left;
-  display: block;
-  color: #f2f2f2;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-  font-size: 17px;
-}
-
-p{color: aliceblue;}
-
-.topnav a:hover {
-  background-color: #ddd;
-  color: black;
-}
-
-.topnav a.active {
-  background-color: #04AA6D;
-  color: white;
-}
-
-.topnav .icon {
-  display: none;
-}
-
-@media screen and (max-width: 600px) {
-  .topnav a:not(:first-child) {display: none;}
-  .topnav a.icon {
-    float: right;
-    display: block;
-  }
-}
-
-@media screen and (max-width: 600px) {
-  .topnav.responsive {position: relative;}
-  .topnav.responsive .icon {
-    position: absolute;
-    right: 0;
-    top: 0;
-  }
-  .topnav.responsive a {
-    float: none;
-    display: block;
-    text-align: left;
-  }
-}
-</style>
-
 
 
 
@@ -90,11 +33,13 @@ p{color: aliceblue;}
 
 
 <script>
+	// import { student } from '$lib/store/user';
 	import { student,user } from './store/user.js';
     import { onMount } from 'svelte';
     import Content from './Content.svelte';
     import Modal from './Modal.svelte';
     import { modal } from './store/modal.js';
+    import { store } from './store/cart.js';
     import PocketBase from 'pocketbase';
     
     const url = 'https://bnet.fly.dev'
@@ -112,15 +57,49 @@ p{color: aliceblue;}
       return resultList.items[0]
     }
     onMount(async()=>{
+      // await 
       let user_local = localStorage.getItem("pocketbase_auth")
       user_local = JSON.parse(user_local)
       if(user_local.model){
         // const id = user.model.id
         const stud = await fetchAndSetStudent(user_local.model)
+        await fetchCart(stud)
         student.set(stud)
         user.set(user_local.model)
       }
     })
+
+
+    const fetchCart = async (student) => {
+
+        const filter = `created >= "2022-01-01 00:00:00" && committed = ${false} && student_id = "${student.id}"`
+        const resultList = await client.records.getList('orders_list', 1, 20, {
+            filter,
+        });
+
+        const setStoreCart = async() => {
+            store.set({
+                ...$store,
+                orders:resultList.items
+            })
+        }
+        await setStoreCart()
+        const getTotal = () => {
+            let total = 0
+            $store.orders.forEach((item)=>{
+                total += (+item.price) * (+item.quantity)
+            })
+            return total
+        }
+        const setStoreTotal = async() => {
+            store.set({
+                ...$store,
+                total:getTotal()
+            })
+        }
+        await setStoreTotal()
+
+    }
 
     let id="topnav"
     function myFunction() {
@@ -133,3 +112,65 @@ p{color: aliceblue;}
     }
 </script>
 
+
+
+
+
+<style>
+
+
+  .topnav {
+    overflow: hidden;
+    background-color: #333;
+  }
+  
+  .topnav a {
+    float: left;
+    display: block;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+  }
+  
+  p{color: aliceblue;}
+  
+  .topnav a:hover {
+    background-color: #ddd;
+    color: black;
+  }
+  
+  .topnav a.active {
+    background-color: #04AA6D;
+    color: white;
+  }
+  
+  .topnav .icon {
+    display: none;
+  }
+  
+  @media screen and (max-width: 600px) {
+    .topnav a:not(:first-child) {display: none;}
+    .topnav a.icon {
+      float: right;
+      display: block;
+    }
+  }
+  
+  @media screen and (max-width: 600px) {
+    .topnav.responsive {position: relative;}
+    .topnav.responsive .icon {
+      position: absolute;
+      right: 0;
+      top: 0;
+    }
+    .topnav.responsive a {
+      float: none;
+      display: block;
+      text-align: left;
+    }
+  }
+  </style>
+  
+  

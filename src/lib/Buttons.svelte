@@ -30,19 +30,19 @@
         return meal
     }
 
-    async function orderFood(food) {
-        
+    async function addOrderFood(food) {
+        const filter = `created >= "2022-01-01 00:00:00" && committed = ${false} && student_id = "${$student.id}" && food_id = "${food.id}"`
         const resultList = await client.records.getList('orders_list', 1, 2, {
-            filter: `(created >= "2022-01-01 00:00:00" && committed = "${false}" && student_id = "${$user.id}" && food_id = "${food.id}")`,
+            filter,
         });
-        console.log(resultList)
+        
         if (resultList.items.length > 0) {
             let update = resultList.items[0]
             update.quantity += 1
             update.total = (food.price*update.quantity)
             update.meal = getMeal()
             const update_record = await client.records.update('orders_list', update.id , update);
-
+            // console.log(filter,resultList)
             return update_record
         } else {
             let data = {
@@ -57,12 +57,35 @@
                 "meal": getMeal()
             };
 
-            console.log(data)
-
+            
             const new_record = await client.records.create('orders_list', data);
+            // console.log("new",new_record)
             return new_record
         }
         
+        
+    }
+
+    async function removeOrderFood(food) {
+        const filter = `created >= "2022-01-01 00:00:00" && committed = ${false} && student_id = "${$student.id}" && food_id = "${food.id}"`
+        const resultList = await client.records.getList('orders_list', 1, 2, {
+            filter,
+        });
+        let update = {quantity:0}
+        if (resultList.items.length > 0) {
+            update = resultList.items[0]
+            update.quantity -= 1
+            update.total = (food.price*update.quantity)
+            update.meal = getMeal()
+            if (update.quantity > 0) {
+                const update_record = await client.records.update('orders_list', update.id , update);
+                return update_record
+            } else {
+                await client.records.delete('orders_list', update.id);
+            }
+            return update
+        } 
+        return update
         
     }
 
@@ -72,30 +95,21 @@
     let quantity = 0
     let total = 0
 
-    const addCart = (food_obj) => {
-        let cart = $store.orders;
-        const obj = orderFood(food_obj)
-        // const obj = {
-        //     name:food_obj.name,
-        //     id:food_obj.id,
-        //     price:food_obj.price,
-        //     quantity:1,
-        // }
-        const exist = cart.find(item=>item.id==food_obj.id)
-        if (exist != null && exist != undefined) {
-            cart = cart.filter(item=>item.id != exist.id)
-            cart = [...cart,obj]
-        } else {
-            cart = [...cart,obj]
+    const addCart = async (food_obj) => {
+        const record = await addOrderFood(food_obj)
+        quantity = record.quantity
+        const filter = `created >= "2022-01-01 00:00:00" && committed = ${false} && student_id = "${$student.id}"`
+        const resultList = await client.records.getList('orders_list', 1, 20, {
+            filter,
+        });
+
+        const setStoreCart = async() => {
+            store.set({
+                ...$store,
+                orders:resultList.items
+            })
         }
-
-        
-        store.set({
-            ...$store,
-            orders:cart
-        })
-
-        
+        await setStoreCart()
         const getTotal = () => {
             let total = 0
             $store.orders.forEach((item)=>{
@@ -103,14 +117,47 @@
             })
             return total
         }
-        
-        store.set({
-            ...$store,
-            total:getTotal()
-        })
+        const setStoreTotal = async() => {
+            store.set({
+                ...$store,
+                total:getTotal()
+            })
+        }
+        await setStoreTotal()
+
+    }
 
 
-        console.log($store.orders)
+    const removeCart = async (food_obj) => {
+        const record = await removeOrderFood(food_obj)
+        quantity = record.quantity
+        const filter = `created >= "2022-01-01 00:00:00" && committed = ${false} && student_id = "${$student.id}"`
+        const resultList = await client.records.getList('orders_list', 1, 20, {
+            filter,
+        });
+
+        const setStoreCart = async() => {
+            store.set({
+                ...$store,
+                orders:resultList.items
+            })
+        }
+        await setStoreCart()
+        const getTotal = () => {
+            let total = 0
+            $store.orders.forEach((item)=>{
+                total += (+item.price) * (+item.quantity)
+            })
+            return total
+        }
+        const setStoreTotal = async() => {
+            store.set({
+                ...$store,
+                total:getTotal()
+            })
+        }
+        await setStoreTotal()
+
     }
     
 
@@ -119,7 +166,7 @@
 </script>
 
 <div class="btn-group">
-    <button>-</button>
+    <button on:click={()=>removeCart(foody)}>-</button>
     <button>{quantity}</button>
     <button on:click={()=>addCart(foody)}>+</button>
 </div>

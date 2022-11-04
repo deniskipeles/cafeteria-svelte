@@ -2,7 +2,7 @@
     import { getContext } from 'svelte';
     import Dialog from './Dialog.svelte';
     import { store } from './store/cart.js';
-    import { user } from './store/user.js';
+    import { user,student } from './store/user.js';
     import { order } from './store/order.js';
 
     import PocketBase from 'pocketbase';
@@ -28,23 +28,53 @@
     }
     async function createOrder() {
 
+        const food_items = $store.orders.map((item)=>{
+
+            return {
+                "id": item.id,
+                "created": item.created,
+                "quantity": item.quantity,
+                "total": item.total,
+                "name": item.name,
+                "price": item.price
+            }
+        })
+
         const data = {
             date: new Date(),
-            student_id:$user.id,
-            order_for_student_id:$user.id,
+            student_id:$student.id,
+            commit:false,
+            total:$store.total,
+            order:food_items,
+            order_for_student_id:$student.id,
             meal: getMeal()
         };
     
         const record = await client.records.create('orders', data);
-        order.set(record)
-      return record;
-        
+        if(record.id){
+            const updateList =async()=>{
+                $store.orders.forEach(async(data)=>{
+                    data.committed = true
+                    data.order_id = record.id
+                    await client.records.update('orders_list', data.id, data);
+                })
+                store.set({
+                    ...$store,
+                    orders:[]
+                })
+
+            }
+            updateList()
+        }
+        // order.set(record)
+        console.log(record)
+        return record;
     }
 
 
-    const deleteOrder = async() => {
-        await client.records.delete('orders', $order.id);
-    }
+    // const deleteOrder = async(order) => {
+    //     await client.records.delete('orders', $order.id);
+    // }
     const { open } = getContext('simple-modal');
       
       let opening = false;
@@ -58,16 +88,17 @@
       const onCancel = (text) => {
           name = '';
           status = -1;
-          deleteOrder()
+        //   deleteOrder()
       }
       
       const onOkay = (text) => {
           name = text;
           status = 1;
+          createOrder()
       }
   
     const showDialog = () => {
-        createOrder()
+        // createOrder()
           open(
               Dialog,
               {
