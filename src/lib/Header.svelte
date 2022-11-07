@@ -3,6 +3,13 @@
 <svelte:head>
     <!-- head content -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    
+    <!-- head content -->
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    
 </svelte:head>
 
 
@@ -14,14 +21,26 @@
 <div class={id}>
   <a href="/" class="active">Home</a>
   <a href="/pre-order">Pre Order</a>
-  <a href="/contact">Mess Contact</a>
-  <a href="/about">About</a>
+  <a href={`/statement/${$student.id}`}>History</a>
+  <a href="/account">Account</a>
   <a href="javascript:void(0);" class="icon" on:click={myFunction}>
     <i class="fa fa-bars"></i>
   </a>
-  <Modal show={$modal}>
-    <Content />
-  </Modal>
+  {#if $user.id}
+     <!-- content here -->
+     <!-- svelte-ignore a11y-click-events-have-key-events -->
+     <p on:click={signOut} class="btn btn-danger btn-sm">
+          <span class="glyphicon glyphicon-log-out"></span> Log out
+      </p>
+      <Modal show={$modal}>
+        <Content />
+      </Modal>
+  {:else}
+     <!-- else content here -->
+     <a href="/login" class="btn btn-info btn-sm">
+          <span class="glyphicon glyphicon-log-out"></span> Login
+     </a>
+  {/if}
   
 </div>
 
@@ -41,10 +60,16 @@
     import { modal } from './store/modal.js';
     import { store } from './store/cart.js';
     import PocketBase from 'pocketbase';
+    import { goto } from "$app/navigation";
     
     const url = 'https://bnet.fly.dev'
 
     const client = new PocketBase(url);
+
+    const signOut = () => {
+        client.authStore.clear();
+        goto('/',{replaceState:true})
+    }
 
 
     const fetchAndSetStudent = async(user) => {

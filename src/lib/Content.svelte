@@ -2,9 +2,8 @@
     import { getContext } from 'svelte';
     import Dialog from './Dialog.svelte';
     import { store } from './store/cart.js';
-    import { user,student } from './store/user.js';
-    import { order } from './store/order.js';
-
+    import { student } from './store/user.js';
+    
     import PocketBase from 'pocketbase';
 
     const client = new PocketBase('https://bnet.fly.dev');
@@ -40,14 +39,18 @@
             }
         })
 
+        var val = Math.floor(1000 + Math.random() * 90000);
+        console.log(val,$student.admission)
         const data = {
             date: new Date(),
+            s_number:val,
             student_id:$student.id,
             commit:false,
             total:$store.total,
             order:food_items,
             order_for_student_id:$student.id,
-            meal: getMeal()
+            meal: getMeal(),
+            reg_number:$student.admission
         };
     
         const record = await client.records.create('orders', data);
@@ -60,14 +63,20 @@
                 })
                 store.set({
                     ...$store,
-                    orders:[]
+                    orders:[],
+                    total:0
                 })
 
             }
             updateList()
+            store.set({
+                    ...$store,
+                    orders:[],
+                    total:0
+                })
         }
         // order.set(record)
-        console.log(record)
+        // console.log(record)
         return record;
     }
 
@@ -94,7 +103,10 @@
       const onOkay = (text) => {
           name = text;
           status = 1;
-          createOrder()
+          if ($store.orders.length > 0) {
+              createOrder()
+            
+          }
       }
   
     const showDialog = () => {
@@ -116,9 +128,22 @@
       };
   </script>
   
+
+
+
+
+
+
+  <svelte:head>
+    <!-- head content -->
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    
+</svelte:head>
   <section>
       
-      <button on:click={showDialog}>Cart {$store.total}</button>
+      <button class="btn btn-large btn-info" on:click={showDialog}>Cart {$store.total}</button>
   </section>
   
   <style>

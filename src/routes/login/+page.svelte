@@ -1,6 +1,8 @@
 <script>
+    import { goto } from '$app/navigation';
     import { user,student } from '$lib/store/user';
     import PocketBase from 'pocketbase';
+    
     
     const url = 'https://bnet.fly.dev'
 
@@ -26,6 +28,7 @@
           const stud = await fetchAndSetStudent(userAuthData.user)
           student.set(stud)
           user.set(userAuthData.user)
+          goto('/',{replaceState:true})
         }
     }
 </script>
@@ -43,9 +46,13 @@
             <span>Password</span>
           </div>
           <div class="inputbox">
-            <input type="submit" value="signin">
+            <input on:click|preventDefault={signin} type="button" value="signin">
           </div>
         </form>
+        <hr/>
+        <div class="inputbox">
+          <a href="/register">sign up</a>
+        </div>
       </div>
 </div>
 

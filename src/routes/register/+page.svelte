@@ -85,7 +85,7 @@
             <span>Confirm Password</span>
           </div>
           <div class="inputbox">
-            <input type="submit" value="signup">
+            <input on:click|preventDefault={signup} type="button" value="signup">
           </div>
         </form>
       </div>
