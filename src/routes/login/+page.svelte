@@ -17,7 +17,7 @@
       const resultList = await client.records.getList('students', 1, 2, {
           filter,
       });
-      console.log(resultList)
+      // console.log(resultList)
       return resultList.items[0]
     }
     
@@ -28,7 +28,7 @@
           const stud = await fetchAndSetStudent(userAuthData.user)
           student.set(stud)
           user.set(userAuthData.user)
-          goto('/',{replaceState:true})
+          goto('/pre-order',{replaceState:true})
         }
     }
 </script>

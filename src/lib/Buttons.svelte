@@ -166,9 +166,17 @@
 </script>
 
 <div class="btn-group">
-    <button on:click={()=>removeCart(foody)}>-</button>
+    <button on:click={()=>{
+        if ($student.id) {     
+            removeCart(foody)
+        }
+    }}>-</button>
     <button>{quantity}</button>
-    <button on:click={()=>addCart(foody)}>+</button>
+    <button on:click={()=>{
+        if ($student.id) {
+            addCart(foody)
+        }
+    }}>+</button>
 </div>
 
 

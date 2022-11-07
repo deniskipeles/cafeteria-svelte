@@ -68,6 +68,8 @@
 
     const signOut = () => {
         client.authStore.clear();
+        student.set({})
+        user.set({})
         goto('/',{replaceState:true})
     }
 
