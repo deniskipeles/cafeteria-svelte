@@ -214,7 +214,7 @@
 {#each food_items as item}
     <div>
         <Card img={`${data.url}/api/files/${item["@collectionId"]}/${item.id}/${item.image}?thumb=150x150`} reverse={vCard}>
-        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{item.name}</h5>
+        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{item.name} &nbsp; {item.price}</h5>
         <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
             {#if item.other_names}
                  {#each item.other_names as names}
