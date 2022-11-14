@@ -2,6 +2,16 @@
     import { goto } from '$app/navigation';
     import { user,student } from '$lib/store/user';
     import PocketBase from 'pocketbase';
+    import { onMount } from "svelte";
+
+    onMount(() => {
+		// ...the DOM is now in sync with the data
+    const url = location.pathname
+    // console.log(url)
+    if ($user.id !== null && $user.id !== undefined) {
+      goto('/',{replaceState:true})
+    }
+	});
     
     
     const url = 'https://bnet.fly.dev'

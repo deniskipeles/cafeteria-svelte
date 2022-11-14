@@ -1,4 +1,5 @@
 <script>
+    import { goto } from '$app/navigation';
     import { user as store, student } from '$lib/store/user';
     import PocketBase from 'pocketbase';
 
@@ -11,13 +12,20 @@
     let password='';
     let email='';
     let passwordConfirm='';
+    let inValidEmailError = "";
+    let user = {}
     
     const signup = async() => {
-      const user = await client.users.create({
-          email,
-          password,
-          passwordConfirm,
-      });  
+      const valid=email.includes("@student.") && email.includes("-")
+      if(valid){
+        user = await client.users.create({
+            email,
+            password,
+            passwordConfirm,
+        });  
+      }else{
+        inValidEmailError = email+" is not a valid student email"
+      }
       // set user profile data
       function getRegistration(user_email) {
         let mail_list = user_email.split("@")
@@ -49,11 +57,13 @@
         }
 
         // console.log(data)
+        
 
         const record = await client.records.create('students', data);
         if (record.id) {
           store.set(user)
           student.set(record)
+          goto("/",{replaceState:true})
         }
 
       }
@@ -88,6 +98,7 @@
             <input on:click|preventDefault={signup} type="button" value="signup">
           </div>
         </form>
+        <p color="red">{inValidEmailError}</p>
       </div>
 </div>
 

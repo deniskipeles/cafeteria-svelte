@@ -1,6 +1,20 @@
 <script>
-    import { order } from "$lib/store/order";
     import { onDestroy } from "svelte";
+    import { goto } from "$app/navigation";
+    import { user } from "$lib/store/user.js";
+    import { onMount } from "svelte";
+
+    onMount(() => {
+		// ...the DOM is now in sync with the data
+    const url = location.pathname
+    // console.log(url)
+    if ($user.id == null || $user.id == undefined) {
+      let result = url.includes("/statement");
+      if (result) {
+        goto('/login',{replaceState:true})
+      }
+    }
+	});
 
 
     export let data
@@ -47,8 +61,13 @@
 
 <svelte:head>
     <!-- <link rel="stylesheet" href=""> -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <title>
+        The Full History of My Cafeteria Expenditure
+    </title>
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"> -->
 </svelte:head>
+
+
 
 <div class="container">
                       
