@@ -103,7 +103,7 @@
   </div>
   <NavUl {hidden} class="order-1">
     <NavLi href="/" active={true}>Home</NavLi>
-    <NavLi href="/add-to-cart">Meal Booking</NavLi>
+    <NavLi href="/add-to-cart">Meal Card Booking</NavLi>
     <NavLi href={`/statement/${$student.id}`}>History</NavLi>
     <NavLi href="/account">Account</NavLi>
     <!-- <NavLi href="/contact">Contact</NavLi> -->
